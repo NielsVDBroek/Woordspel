@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\WoordspelController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,10 +26,12 @@ Route::get('/db-test', function () {
     }
 });
 
-
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/play', [WoordspelController::class, 'index'])->name('main');
+Route::post('/check', [WoordspelController::class, 'checkGuess'])->name('checkGuess');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
