@@ -1,22 +1,26 @@
-<?php 
-// app/Services/WordService.php
+<?php
 
 namespace App\Services;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WordService
 {
-    protected $apiUrl = 'https://api.datamuse.com/words';
+    protected $apiUrl = 'https://api.datamuse.com/words?sp=?????';
 
     public function getFiveLetterWords()
     {
-        $response = Http::get($this->apiUrl, [
-            'sp' => '?????' // Pattern for 5-letter words
-        ]);
+        try {
+            $response = Http::get($this->apiUrl);
 
-        if ($response->successful()) {
-            return array_column($response->json(), 'word');
+            if ($response->successful()) {
+                return array_column($response->json(), 'word');
+            }
+
+            Log::error('Failed to fetch words from API.', ['status' => $response->status()]);
+        } catch (\Exception $e) {
+            Log::error('Exception occurred while fetching words from API.', ['exception' => $e->getMessage()]);
         }
 
         return [];

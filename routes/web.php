@@ -30,8 +30,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/play', [WoordspelController::class, 'index'])->name('main');
-Route::post('/check', [WoordspelController::class, 'checkGuess'])->name('checkGuess');
+Route::get('/play', [WoordspelController::class, 'index']);
+Route::post('/guess', [WoordspelController::class, 'checkGuess'])->name('checkGuess');
+Route::post('/reset', [WoordspelController::class, 'resetGame'])->name('resetGame');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
