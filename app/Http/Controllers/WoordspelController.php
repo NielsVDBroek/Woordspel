@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Services\WordService;
+use App\Models\User;
 
 class WoordspelController extends Controller
 {
@@ -47,6 +48,13 @@ class WoordspelController extends Controller
         $attempts = $request->session()->get('attempts', 0) + 1;
         $request->session()->put('attempts', $attempts);
         $triesLeft = 5 - $attempts;
+
+        if ($win) {
+            $user = User::find(auth()->id());
+            if ($user) {
+                $user->increment('games_won');
+            }
+        }
 
         $response = [
             'result' => $result,

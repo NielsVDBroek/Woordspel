@@ -6,11 +6,23 @@
     <title>Woordspel</title>
     <link rel="stylesheet" href="{{ asset('css/game.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.bunny.net">
+    <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+
+    <!-- Scripts -->
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+
+
 </head>
 <body>
+    <header>
+        @include('layouts.navigation')
+    </header>
     <div class="gamePage">
         <div class="gameContainer">
-            <h1>Woordspel</h1>
+            <div class="gameTitle">Woordspel</div>
 
             <form id="guessForm">
                 <div class="grid" id="gameGrid">
