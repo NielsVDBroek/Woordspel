@@ -20,7 +20,10 @@
     <header>
         @include('layouts.navigation')
     </header>
-    <a href="/play" >Play Game</a>
+    <div class="index-container">
+        <a href="/play" >Play Game</a>
+    </div>
+    
 
 </body>
 </html>
