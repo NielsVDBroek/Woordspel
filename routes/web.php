@@ -3,7 +3,6 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WoordspelController;
-use App\Http\Controllers\LeaderboardController;
 
 
 /*
@@ -19,6 +18,10 @@ use App\Http\Controllers\LeaderboardController;
 
 use Illuminate\Support\Facades\DB;
 
+Route::get('/', function () {
+    return view('home.index');
+});
+
 Route::get('/db-test', function () {
     try {
         DB::connection()->getPdo();
@@ -28,17 +31,21 @@ Route::get('/db-test', function () {
     }
 });
 
+use App\Http\Controllers\LeaderboardController;
+
+Route::get('/leaderboard', [LeaderboardController::class, 'index'])->name('leaderboard.index');
+
+
 use App\Http\Controllers\FriendsController;
 
 Route::middleware(['auth'])->group(function () {
-    Route::post('/send-friend-request/{recipientId}', [FriendsController::class, 'sendFriendRequest'])->name('send.friend.request');
+    Route::get('/send-friend-request/{recipientId}', [FriendsController::class, 'showSendRequestForm'])
+         ->name('show.send.friend.request.form');
+    Route::post('/send-friend-request/{recipientId}', [FriendsController::class, 'sendFriendRequest'])
+         ->name('send.friend.request');
+         Route::get('/incoming-requests', [FriendsController::class, 'showIncomingRequests'])->name('incoming.requests');
     Route::post('/accept-friend-request/{friendshipId}', [FriendsController::class, 'acceptFriendRequest'])->name('accept.friend.request');
     Route::post('/decline-friend-request/{friendshipId}', [FriendsController::class, 'declineFriendRequest'])->name('decline.friend.request');
-    Route::get('/incoming-requests', [FriendsController::class, 'showIncomingRequests'])->name('incoming.friend.requests');
-});
-
-Route::get('/', function () {
-    return view('home.index');
 });
 
 Route::middleware('auth')->group(function () {
