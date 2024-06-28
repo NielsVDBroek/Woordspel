@@ -149,26 +149,8 @@
         });
 
         document.getElementById('resetGameButton').addEventListener('click', function() {
-            fetch('{{ route('resetGame') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(() => {
-                // Reload the page after resetting
-                location.reload();
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+
+            window.location.href = '/play';
         });
 
         document.getElementById('cell0').focus();
