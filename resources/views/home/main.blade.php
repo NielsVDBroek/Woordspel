@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woordspel</title>
     <link rel="stylesheet" href="{{ asset('css/game.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <title>Woordspel</title>
 </head>
-
 <body>
     <div class="gamePage">
         <div class="gameContainer">
             <h1>Woordspel</h1>
+
             <form id="guessForm">
                 <div class="grid" id="gameGrid">
                     @for ($row = 0; $row < 5; $row++)
@@ -22,6 +21,7 @@
                         @endfor
                     @endfor
                 </div>
+
                 <div class="gameButtonsContainer">
                     <div>
                         <button class="gameButton" type="submit">Submit Guess</button>
@@ -32,6 +32,7 @@
                 </div>
                 @csrf
             </form>
+
             <div id="gameResults"></div>
         </div>
     </div>
@@ -76,10 +77,13 @@
 
             if (!data.win && data.triesLeft > 0) {
                 currentRow++;
-                currentCol = 0;
+                currentCol = 0; // Reset the column to the first one
+
                 const nextRowFirstCell = document.getElementById('cell' + (currentRow * 5));
                 if (nextRowFirstCell) {
-                    nextRowFirstCell.focus();
+                    setTimeout(() => {
+                        nextRowFirstCell.focus();
+                    }, 100); // Slight delay to ensure the DOM is updated
                 }
             }
         }
@@ -88,6 +92,7 @@
             cell.addEventListener('input', function() {
                 let char = this.value.toUpperCase();
                 if (/^[A-Z]$/.test(char)) {
+                    this.value = char;
                     moveFocusToNextCell();
                 } else {
                     this.value = '';
@@ -119,49 +124,55 @@
             }
 
             fetch('{{ route('checkGuess') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({
-                        guess: guess,
-                        row: currentRow
-                    })
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    guess: guess,
+                    row: currentRow
                 })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    handleResponse(data);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                handleResponse(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('resetGameButton').addEventListener('click', function() {
+            fetch('{{ route('resetGame') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(() => {
+                // Reload the page after resetting
+                location.reload();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
 
         document.getElementById('cell0').focus();
-
-        function resetGame() {
-            document.querySelectorAll('.cell').forEach(cell => {
-                cell.value = '';
-                cell.className = 'cell';
-            });
-            currentRow = 0;
-            currentCol = 0;
-            const gameResults = document.getElementById('gameResults');
-            gameResults.innerHTML = '';
-            document.getElementById('cell0').focus();
-        }
-
-        document.getElementById('resetGameButton').addEventListener('click', function() {
-            resetGame();
-        });
     </script>
 
 </body>
-
 </html>

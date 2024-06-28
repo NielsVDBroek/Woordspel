@@ -1,10 +1,9 @@
 <?php
-// app/Http/Controllers/WoordspelController.php
 
 namespace App\Http\Controllers;
 
-use App\Services\WordService;
 use Illuminate\Http\Request;
+use App\Services\WordService;
 
 class WoordspelController extends Controller
 {
@@ -17,21 +16,21 @@ class WoordspelController extends Controller
 
     public function index()
     {
+        // Generate a new random word for the new game
         $word = $this->wordService->getRandomFiveLetterWord();
-        session(['word' => $word]); // Store word in session
+        
+        // Store the new word in the session and reset attempts
+        session(['word' => $word, 'attempts' => 0]);
+
+        // Return the view with the correct path
         return view('home.main', ['word' => $word]);
     }
 
     public function checkGuess(Request $request)
-{
-    try {
+    {
         $guess = strtolower($request->input('guess'));
         $word = strtolower($request->session()->get('word'));
         $row = $request->input('row');
-
-        if (!$guess || !$word) {
-            throw new \Exception('Invalid guess or word not found in session.');
-        }
 
         $result = [];
         for ($i = 0; $i < 5; $i++) {
@@ -58,10 +57,14 @@ class WoordspelController extends Controller
         ];
 
         return response()->json($response);
-    } catch (\Exception $e) {
-        // Log the error for debugging purposes
-        return response()->json(['error' => $e->getMessage()], 500);
     }
-}
 
+    public function resetGame(Request $request)
+    {
+        // Clear session data for the game
+        $request->session()->forget(['word', 'attempts']);
+
+        // Redirect to the play route to start a new game
+        return redirect()->route('play');
+    }
 }
