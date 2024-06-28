@@ -1,4 +1,5 @@
 <?php
+// app/Http/Controllers/WoordspelController.php
 
 namespace App\Http\Controllers;
 
@@ -17,15 +18,20 @@ class WoordspelController extends Controller
     public function index()
     {
         $word = $this->wordService->getRandomFiveLetterWord();
-        session(['word' => $word, 'attempts' => 0]);
+        session(['word' => $word]); // Store word in session
         return view('home.main', ['word' => $word]);
     }
 
     public function checkGuess(Request $request)
-    {
+{
+    try {
         $guess = strtolower($request->input('guess'));
         $word = strtolower($request->session()->get('word'));
         $row = $request->input('row');
+
+        if (!$guess || !$word) {
+            throw new \Exception('Invalid guess or word not found in session.');
+        }
 
         $result = [];
         for ($i = 0; $i < 5; $i++) {
@@ -52,12 +58,10 @@ class WoordspelController extends Controller
         ];
 
         return response()->json($response);
+    } catch (\Exception $e) {
+        // Log the error for debugging purposes
+        return response()->json(['error' => $e->getMessage()], 500);
     }
+}
 
-    public function resetGame()
-    {
-        $word = $this->wordService->getRandomFiveLetterWord();
-        session(['word' => $word, 'attempts' => 0]);
-        return response()->json(['message' => 'Game reset successfully.', 'word' => $word]);
-    }
 }

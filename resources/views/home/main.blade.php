@@ -27,7 +27,7 @@
                         <button class="gameButton" type="submit">Submit Guess</button>
                     </div>
                     <div>
-                        <button class="gameButton" id="resetGameButton">Start New Game</button>
+                        <button type="button" class="gameButton" id="resetGameButton">Start New Game</button>
                     </div>
                 </div>
                 @csrf
@@ -56,7 +56,7 @@
             data.result.forEach((res, index) => {
                 const cell = document.getElementById('cell' + (data.row * 5 + index));
                 if (cell) {
-                    cell.value = res.letter;
+                    cell.value = res.letter.toUpperCase();
                     cell.className = 'cell ' + res.status;
                 } else {
                     console.error('Cell not found:', 'cell' + (data.row * 5 + index));
@@ -129,7 +129,12 @@
                         row: currentRow
                     })
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     handleResponse(data);
                 })
@@ -141,38 +146,21 @@
         document.getElementById('cell0').focus();
 
         function resetGame() {
-            fetch('{{ route('resetGame') }}', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    document.querySelectorAll('.cell').forEach(cell => {
-                        cell.value = '';
-                        cell.className = 'cell';
-                    });
-
-                    currentRow = 0;
-                    currentCol = 0;
-
-                    const gameResults = document.getElementById('gameResults');
-                    gameResults.innerHTML = '';
-
-                    document.getElementById('cell0').focus();
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            document.querySelectorAll('.cell').forEach(cell => {
+                cell.value = '';
+                cell.className = 'cell';
+            });
+            currentRow = 0;
+            currentCol = 0;
+            const gameResults = document.getElementById('gameResults');
+            gameResults.innerHTML = '';
+            document.getElementById('cell0').focus();
         }
 
         document.getElementById('resetGameButton').addEventListener('click', function() {
             resetGame();
         });
     </script>
-
 
 </body>
 

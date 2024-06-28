@@ -15,7 +15,12 @@ class WordService
             $response = Http::get($this->apiUrl);
 
             if ($response->successful()) {
-                return array_column($response->json(), 'word');
+                $words = array_column($response->json(), 'word');
+                // Filter out words that are not exactly five letters long or contain spaces
+                $filteredWords = array_filter($words, function($word) {
+                    return strlen($word) === 5 && strpos($word, ' ') === false;
+                });
+                return $filteredWords;
             }
 
             Log::error('Failed to fetch words from API.', ['status' => $response->status()]);
